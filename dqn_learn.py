@@ -38,6 +38,7 @@ Statistic = {
     "best_mean_episode_rewards": []
 }
 
+
 def dqn_learing(
     env,
     q_func,
@@ -186,13 +187,14 @@ def dqn_learing(
 
         # YOUR CODE HERE
         
+        idx = replay_buffer.store_frame(last_obs)
         obs = replay_buffer.encode_recent_observation()
         action = select_epilson_greedy_action(Q, obs, t)
         next_obs, reward, done, _ = env.step(action.item())
-        replay_buffer.add(obs, action.item(), reward, next_obs, done)
-        obs = next_obs
+        replay_buffer.store_effect(idx, action, reward, done)
+        last_obs = next_obs
         if done:
-            obs = env.reset()
+            last_obs = env.reset()
 
         #####
 
