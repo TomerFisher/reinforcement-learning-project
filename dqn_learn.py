@@ -130,6 +130,7 @@ def dqn_learing(
     Q = q_func(input_arg, num_actions).type(dtype)
     target_Q = q_func(input_arg, num_actions).type(dtype)
     target_Q.load_state_dict(Q.state_dict())
+    target_Q.eval()
 
     ######
 
@@ -245,12 +246,9 @@ def dqn_learing(
             next_q_values = target_Q(next_obs_batch).max(1)[0]
             mask = 1 - done_batch
             target_q_values = reward_batch + gamma * mask * next_q_values
-            # Clip the error between [-1, 1]
-            error = target_q_values - q_values
-            clipped_error = error.clamp(-1, 1)
             
+            loss = F.mse_loss(q_values, target_q_values)
             optimizer.zero_grad()
-            loss = (clipped_error.pow(2) * 0.5).mean()
             loss.backward()
             optimizer.step()
             
